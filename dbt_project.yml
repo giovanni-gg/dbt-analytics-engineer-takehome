@@ -1,0 +1,24 @@
+name: 'de_dbt_interview'
+version: '1.0.0'
+config-version: 2
+
+profile: 'de_dbt_interview'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  de_dbt_interview:
+    staging:
+      +materialized: view
+    core:
+      +materialized: view
+    marts:
+      +materialized: table
