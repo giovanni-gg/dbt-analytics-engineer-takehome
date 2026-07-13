@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: core_amazon_ads
+    description: >
+      Ad spend enriched with product name and marketing category. Products missing
+      from the master are labelled 'Unknown'. Includes a flag marking refunds.
+    columns:
+      - name: ad_id
+        description: Unique identifier of the ad.
+      - name: ad_date
+        description: Date the ad cost was incurred.
+      - name: market
+        description: Marketplace the ad ran in.
+      - name: product_id
+        description: Product identifier (child ASIN).
+      - name: product_name
+        description: Product display name, or 'Unknown' when absent from the master.
+      - name: product_marketing_category
+        description: >
+          Marketing category for reporting, or 'Unknown' when the product is absent
+          from the master.
+      - name: ad_cost
+        description: Ad spend amount.
+      - name: is_refund
+        description: True when ad_cost is negative, i.e. the row is a refund/credit.
+
+  - name: core_amazon_orders
+    description: >
+      Order lines enriched with product name and marketing category. Products missing
+      from the master are labelled 'Unknown'. Includes a flag marking refunds.
+    columns:
+      - name: order_id
+        description: Unique identifier of the order line.
+      - name: order_date
+        description: Order date, extracted from order_time.
+      - name: order_time
+        description: Timestamp the order was placed.
+      - name: market
+        description: Marketplace the order was placed in.
+      - name: product_id
+        description: Product identifier (child ASIN).
+      - name: product_name
+        description: Product display name, or 'Unknown' when absent from the master.
+      - name: product_marketing_category
+        description: >
+          Marketing category for reporting, or 'Unknown' when the product is absent
+          from the master.
+      - name: sales_amount
+        description: Sales amount of the order line.
+      - name: is_refund
+        description: True when sales_amount is negative, i.e. the row is a refund.

@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: mart_sales
+    description: >
+      Daily sales aggregated by product marketing category. Includes a no-refunds
+      view (refund rows excluded) and a total view (includes refunds). Rows with
+      a NULL order date are excluded, since they cannot be placed on a daily grain;
+      they remain available in core.
+    columns:
+      - name: product_marketing_category
+        description: Marketing category used for reporting.
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: order_date
+        description: Date the orders were placed.
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: sales_no_refunds
+        description: Sum of sales amounts excluding refund rows.
+      - name: sales_total
+        description: Sum of all sales amounts, including refunds.
+
+  - name: mart_ad_spend
+    description: >
+      Daily ad spend aggregated by product marketing category. Includes a no-refunds
+      view (refund/credit rows excluded) and a total view (includes refunds). Rows
+      with a NULL ad date are excluded, since they cannot be placed on a daily grain;
+      they remain available in core.
+    columns:
+      - name: product_marketing_category
+        description: Marketing category used for reporting.
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: ad_date
+        description: Date the ad cost was incurred.
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: ad_spend_no_refunds
+        description: Sum of ad costs excluding refund/credit rows.
+      - name: ad_spend_total
+        description: Sum of all ad costs, including refunds and credits.
+
+  - name: mart_sales_and_ad_spend
+    description: >
+      Daily sales and ad spend combined by product marketing category. Uses a full
+      outer join so category-day combinations with only sales or only ad spend are
+      retained; missing metrics are coalesced to zero. sales_minus_ad_spend is
+      sales_total minus ad_spend_total (includes refunds/credits on both sides).
+    columns:
+      - name: product_marketing_category
+        description: Marketing category used for reporting.
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: activity_date
+        description: Calendar date for the category-day grain (order date or ad date).
+        data_tests:
+          - not_null:
+              config:
+                severity: error
+      - name: sales_no_refunds
+        description: Sum of sales amounts excluding refund rows.
+      - name: sales_total
+        description: Sum of all sales amounts, including refunds.
+      - name: ad_spend_no_refunds
+        description: Sum of ad costs excluding refund/credit rows.
+      - name: ad_spend_total
+        description: Sum of all ad costs, including refunds and credits.
+      - name: sales_minus_ad_spend
+        description: sales_total minus ad_spend_total.

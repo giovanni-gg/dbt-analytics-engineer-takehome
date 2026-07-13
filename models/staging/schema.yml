@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: stg_amazon_ads
+    description: >
+      Amazon ad spend for all markets (union of the DE and UK raw extracts).
+      One row per ad_id; uniqueness is enforced by tests.
+    columns:
+      - name: ad_id
+        description: Unique identifier of the ad.
+        data_tests:
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
+      - name: ad_date
+        description: Date the ad cost was incurred.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: market
+        description: >
+          Marketplace the ad ran in. DE or UK; DK is also accepted since Denmark
+          has no Amazon marketplace and Danish activity is served through Amazon DE.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['DE', 'DK', 'UK']
+              config:
+                severity: warn
+      - name: product_id
+        description: Product identifier (child ASIN in the raw extract).
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_product_master')
+                field: product_id
+              config:
+                severity: warn
+      - name: ad_cost
+        description: Ad spend amount, cast to decimal(18, 2).
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: stg_amazon_orders
+    description: >
+      Amazon order lines for all markets (union of the DE and UK raw extracts).
+      One row per order_id; uniqueness is enforced by tests.
+    columns:
+      - name: order_id
+        description: Unique identifier of the order line.
+        data_tests:
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
+      - name: order_date
+        description: Order date, extracted from order_time.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: order_time
+        description: Timestamp the order was placed.
+      - name: market
+        description: >
+          Marketplace the order was placed in. DE or UK; DK is also accepted since
+          Danish orders are served through Amazon DE.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['DE', 'DK', 'UK']
+              config:
+                severity: warn
+      - name: product_id
+        description: Product identifier (child ASIN in the raw extract).
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_product_master')
+                field: product_id
+              config:
+                severity: warn
+      - name: sales_amount
+        description: Sales amount of the order line, cast to decimal(18, 2).
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: stg_product_master
+    description: >
+      Product master data. Exact duplicate rows are collapsed and rows with a
+      NULL child_asin are removed, so product_id is a reliable primary key.
+    columns:
+      - name: product_id
+        description: Product identifier (child ASIN in the raw extract). Primary key.
+        data_tests:
+          - unique:
+              config:
+                severity: error
+          - not_null:
+              config:
+                severity: error
+      - name: product_name
+        description: Product display name.
+      - name: product_marketing_category
+        description: Marketing category used for reporting.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
