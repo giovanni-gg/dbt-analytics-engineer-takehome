@@ -49,7 +49,6 @@ The solution is organized by layer->model rather than by sections (data quality 
 ### general (all marts)
 
 - **NULL dates**: while staging and core tolerate NULL dates (warning severity) so the full cash flow stays at our disposal, the daily marts are a contract for reporting at category x day grain: a row without a date has no meaning there, so it is filtered out in the mart and the not_null test on the date/category columns runs at error severity. This way the test guards the contract (it can only fail if someone breaks the model), and the pipeline never stops because of a bad source row. One caveat I am aware of: if NULL dates ever appear, the mart totals would diverge from core totals, which is precisely what the warning test at staging alerts us about.
-- **grain uniqueness**: for each mart I have a singular test asserting the category x day grain is really unique.
 
 ### mart_ad_spend
 

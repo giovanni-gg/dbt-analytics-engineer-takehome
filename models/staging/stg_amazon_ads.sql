@@ -1,5 +1,4 @@
--- columns are listed explicitly on each side of the union so a schema change
--- in one raw extract fails loudly instead of silently misaligning columns
+
 with unioned as (
 
     select
